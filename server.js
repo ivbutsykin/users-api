@@ -92,3 +92,5 @@ function validate(...fields) {
     res.status(400).send(`${missing.toString()} is missing`);
   };
 }
+
+module.exports = app;
