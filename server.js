@@ -36,7 +36,7 @@ app.delete('/users/:id', (req, res) => {
   res.status(404).send();
 });
 
-app.patch('/users/:id', whitelist('email', 'name'), (req, res) => {
+app.patch('/users/:id', whitelist('email', 'name', 'gender'), (req, res) => {
   const id = req.params.id;
   const user = users.find(user => user.id === id);
   const body = req.body;
@@ -51,11 +51,12 @@ app.patch('/users/:id', whitelist('email', 'name'), (req, res) => {
   res.status(404).send();
 });
 
-app.post('/users', validate('email', 'name'), (req, res) => {
+app.post('/users', validate('email', 'name', 'gender'), (req, res) => {
   const body = req.body;
   const user = {
     email: body.email,
     name: body.name,
+    gender: body.gender,
     id: Date.now().toString(),
   };
 
