@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const validator = require('email-validator');
 const app = express();
 
 const users = [];
@@ -85,11 +86,10 @@ function validate(...fields) {
     const body = req.body;
     const { email, name, gender } = body;
 
-    const regexEmailValidate = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     const regexNameValidate = /^[A-Za-z\s]+$/;
 
     if (
-      !regexEmailValidate.test(String(email).toLowerCase()) ||
+      !validator.validate(email) ||
       !regexNameValidate.test(name) ||
       (gender.toLowerCase() !== 'male' && gender.toLowerCase() !== 'female')
     ) {
