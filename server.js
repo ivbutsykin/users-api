@@ -8,19 +8,19 @@ const users = [];
 app.use(cors());
 app.use(bodyParser.json());
 
-app.get('/users', (request, response) => {
-  response.json(users);
+app.get('/users', (req, res) => {
+  res.json(users);
 });
 
-app.get('/users/:id', (request, response) => {
-  const id = request.params.id;
+app.get('/users/:id', (req, res) => {
+  const id = req.params.id;
   const user = users.find(user => user.id === id);
 
   if (!!user) {
-    return response.json(user);
+    return res.json(user);
   }
 
-  response.status(404).send();
+  res.status(404).send();
 });
 
 app.delete('/users/:id', (req, res) => {
@@ -72,8 +72,8 @@ function whitelist(...fields) {
   return (req, res, next) => {
     const body = req.body;
 
-    for (const property in req.body) {
-      if (!fields.includes(property)) delete req.body[property];
+    for (const property in body) {
+      if (!fields.includes(property)) delete body[property];
     }
 
     return next();
@@ -83,6 +83,18 @@ function whitelist(...fields) {
 function validate(...fields) {
   return (req, res, next) => {
     const body = req.body;
+    const { email, name, gender } = body;
+
+    const regexEmailValidate = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const regexNameValidate = /^[A-Za-z\s]+$/;
+
+    if (
+      !regexEmailValidate.test(String(email).toLowerCase()) ||
+      !regexNameValidate.test(name) ||
+      (gender.toLowerCase() !== 'male' && gender.toLowerCase() !== 'female')
+    ) {
+      return res.status(400).send();
+    }
 
     if (fields.every(key => !!body[key])) {
       return next();
