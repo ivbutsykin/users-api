@@ -90,6 +90,7 @@ function validate(...fields) {
 
     if (
       !validator.validate(email) ||
+      users.some(user => user.email === email) ||
       !regexNameValidate.test(name) ||
       (gender.toLowerCase() !== 'male' && gender.toLowerCase() !== 'female')
     ) {
