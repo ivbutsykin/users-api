@@ -37,20 +37,25 @@ app.delete('/users/:id', (req, res) => {
   res.status(404).send();
 });
 
-app.patch('/users/:id', whitelist('email', 'name', 'gender'), (req, res) => {
-  const id = req.params.id;
-  const user = users.find(user => user.id === id);
-  const body = req.body;
+app.patch(
+  '/users/:id',
+  validate('email', 'name', 'gender'),
+  whitelist('email', 'name', 'gender'),
+  (req, res) => {
+    const id = req.params.id;
+    const user = users.find(user => user.id === id);
+    const body = req.body;
 
-  if (!!user) {
-    for (const property in body) {
-      user[property] = body[property];
+    if (!!user) {
+      for (const property in body) {
+        user[property] = body[property];
+      }
+      return res.status(200).send(user);
     }
-    return res.status(200).send(user);
-  }
 
-  res.status(404).send();
-});
+    res.status(404).send();
+  }
+);
 
 app.post('/users', validate('email', 'name', 'gender'), (req, res) => {
   const body = req.body;
@@ -84,13 +89,16 @@ function whitelist(...fields) {
 function validate(...fields) {
   return (req, res, next) => {
     const body = req.body;
-    const { email, name, gender } = body;
+    const { email, name, gender, id } = body;
+
+    const currentUser = users.find(user => user.id === id);
 
     const regexNameValidate = /^[A-Za-z\s]+$/;
 
     if (
+      (users.some(user => user.email === email) &&
+        currentUser.email !== email) ||
       !validator.validate(email) ||
-      users.some(user => user.email === email) ||
       !regexNameValidate.test(name) ||
       (gender.toLowerCase() !== 'male' && gender.toLowerCase() !== 'female')
     ) {
